@@ -1,66 +1,59 @@
 package collections
 
-type Reference[T any] interface {
-	Value() T
-}
-
 type Iterator[T any] interface {
 	Next() bool
 }
 
-type Collectable[T any] interface {
-	Collect() []T
-}
-
-type CollectableReferenceIterator[T any] interface {
-	Iterator[Reference[T]]
-	Collectable[T]
-}
-
-type CollectableValueIterator[T any] interface {
-	Iterator[T]
-	Collectable[T]
-}
-
 type Iterable[T any] interface {
-	Iterator() (Iterator[T], *T)
+	Iterator() (Iterator[T], T)
 }
 
-type collectableReferenceIterator[T any] struct {
-	Iterator[Reference[T]]
-	v Reference[T]
-}
-
-func (it collectableReferenceIterator[T]) Collect() []T {
-	var result []T
-	for it.Next() {
-		result = append(result, it.v.Value())
-	}
-	return result
-}
-
-type collectablePointerIterator[T any] struct {
+type IterableIterator[T any] interface {
 	Iterator[T]
-	v *T
+	Iterable[T]
 }
 
-func (it collectablePointerIterator[T]) Collect() []T {
-	var result []T
-	for it.Next() {
-		result = append(result, *it.v)
+type Reference[T any] interface {
+	Value() T
+}
+
+type valueIteratorStream[T any] struct {
+	it Iterator[T]
+	v  *T
+}
+
+type referenceIteratorStream[T any] struct {
+	it Iterator[Reference[T]]
+	r  Reference[T]
+	v  T
+}
+
+func (s *referenceIteratorStream[T]) read() *T {
+	if s.it.Next() {
+		s.v = s.r.Value()
+		return &s.v
 	}
-	return result
+	return nil
 }
 
-type collectableValueIterator[T any] struct {
-	Iterator[T]
-	v T
-}
-
-func (it collectableValueIterator[T]) Collect() []T {
-	var result []T
-	for it.Next() {
-		result = append(result, it.v)
+func (s *valueIteratorStream[T]) read() *T {
+	if s.it.Next() {
+		return s.v
 	}
-	return result
+	return nil
+}
+
+func FromValueIterable[T any](it Iterable[*T]) Stream[T] {
+	it2, v := it.Iterator()
+	return &valueIteratorStream[T]{it2, v}
+}
+
+func FromInterfaceIterable[T any](it Iterable[*T]) Stream[T] {
+	it2, v := it.Iterator()
+	return &valueIteratorStream[T]{it2, v}
+}
+
+func FromReferenceIterable[T any](it Iterable[Reference[T]]) Stream[T] {
+	it2, v := it.Iterator()
+	return &referenceIteratorStream[T]{it: it2, r: v}
 }

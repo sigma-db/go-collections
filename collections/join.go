@@ -10,11 +10,12 @@ type joinIterator[T, U any] struct {
 	*join[T, U]
 	i, j int
 	v    ReferencePair[T, U] // refers to join.s[i] and join.t[j]
+	// vp   *Reference[Pair[T, U]] // refers to join.s[i] and join.t[j]
 }
 
-func (j join[T, U]) Iterator() (CollectableReferenceIterator[Pair[T, U]], *Pair[*T, *U]) {
+func (j join[T, U]) Iterator() (Iterator[Reference[Pair[T, U]]], Reference[Pair[T, U]]) {
 	it := &joinIterator[T, U]{join: &j}
-	return &collectableReferenceIterator[Pair[T, U]]{it, &it.v}, &it.v.Pair
+	return it, &it.v
 }
 
 func (it *joinIterator[T, U]) Next() bool {

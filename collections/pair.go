@@ -2,18 +2,18 @@ package collections
 
 import "fmt"
 
-// Pair is just what its name suggests
+// A Pair is just what its name suggests
 type Pair[T, U any] struct {
 	First  T
 	Second U
 }
 
-// ValuePair is an alias for Pair[T, U] that exists for the sake of naming consistency.
+// A ValuePair is an alias for Pair[T, U] that exists for the sake of naming consistency.
 type ValuePair[T, U any] struct {
 	Pair[T, U]
 }
 
-// ReferencePair acts like a Pair[*T, *U] with an additional method to dereference its elements.
+// A ReferencePair behaves like a Pair[*T, *U] but with its elements being dereferenced before access.
 type ReferencePair[T, U any] struct {
 	Pair[*T, *U]
 }
@@ -62,5 +62,3 @@ func (p *Pair[T, U]) Value() Pair[T, U] {
 func (p *ReferencePair[T, U]) Value() Pair[T, U] {
 	return Pair[T, U]{*p.First, *p.Second}
 }
-
-// TODO check nil pointers in ReferencePair

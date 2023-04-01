@@ -25,6 +25,9 @@ func TestFind(t *testing.T) {
 	}
 }
 
+func TestFilter(t *testing.T) {
+}
+
 func TestMap(t *testing.T) {
 	s := []Pair[int, int]{{1, 2}, {3, 4}, {5, 6}}
 	f := func(p Pair[int, int]) string { return strconv.Itoa(p.First + p.Second) }

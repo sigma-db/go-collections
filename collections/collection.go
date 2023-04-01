@@ -17,6 +17,10 @@ func (it *collectionIterator[T]) Next() bool {
 	return true
 }
 
+func (it *collectionIterator[T]) Iterator() (Iterator[T], *T) {
+	return it, &it.v
+}
+
 func (c Collection[T]) Iterator() (Iterator[T], *T) {
 	it := &collectionIterator[T]{Collection: &c}
 	return it, &it.v

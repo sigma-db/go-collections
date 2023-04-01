@@ -5,27 +5,28 @@ type cartesianProduct[T, U any] struct {
 	t []U
 }
 
-type cartesianProductIterator[T, U any] struct {
+type cartesianProductStream[T, U any] struct {
 	*cartesianProduct[T, U]
 	i, j int
-	v    ReferencePair[T, U] // points to s[i] and t[j]
+	r    ReferencePair[T, U] // points to s[i] and t[j]
+	v    Pair[T, U]
 }
 
-func (it *cartesianProductIterator[T, U]) Next() bool {
-	if it.i >= len(it.s) {
-		return false
+func (s *cartesianProductStream[T, U]) read() *Pair[T, U] {
+	if s.i >= len(s.s) {
+		return nil
 	}
-	it.v.First = &it.s[it.i]
-	it.v.Second = &it.t[it.j]
-	it.j++
-	if it.j == len(it.t) {
-		it.i++
-		it.j = 0
+	s.r.First = &s.s[s.i]
+	s.r.Second = &s.t[s.j]
+	s.j++
+	if s.j == len(s.t) {
+		s.i++
+		s.j = 0
 	}
-	return true
+	s.v = s.r.Value()
+	return &s.v
 }
 
-func (cp cartesianProduct[T, U]) Iterator() (CollectableReferenceIterator[Pair[T, U]], *Pair[*T, *U]) {
-	it := &cartesianProductIterator[T, U]{cartesianProduct: &cp}
-	return &collectableReferenceIterator[Pair[T, U]]{it, &it.v}, &it.v.Pair
+func (cp cartesianProduct[T, U]) Stream() Stream[Pair[T, U]] {
+	return &cartesianProductStream[T, U]{cartesianProduct: &cp}
 }
