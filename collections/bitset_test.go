@@ -3,23 +3,25 @@ package collections
 import "testing"
 
 func TestBitSet(t *testing.T) {
-	const capacity = 132
-	const max = (capacity-2)/4*4 + 2
+	const (
+		cap = 132
+		max = (cap-2)/4*4 + 2
+	)
 
-	bits := NewBitSet(capacity)
-	if bits.Capacity() < capacity {
-		t.Errorf("Expected capacity to be at least %d, got %d", capacity, bits.Capacity())
+	bits := NewBitSet(cap)
+	if bits.Capacity() < cap {
+		t.Errorf("Expected capacity to be at least %d, got %d", cap, bits.Capacity())
 	}
 
 	// set all bits i with i==2 (mod 4)
-	for i := 0; i < capacity; i += 2 {
+	for i := 0; i < cap; i += 2 {
 		bits.Set(i)
 	}
-	for i := 0; i < capacity; i += 4 {
+	for i := 0; i < cap; i += 4 {
 		bits.Unset(i)
 	}
 
-	for i := 0; i < capacity; i++ {
+	for i := 0; i < cap; i++ {
 		if bits.IsSet(i) != (i%4 == 2) {
 			t.Errorf("Expected bit %d to be %v", i, i%4 == 2)
 		}

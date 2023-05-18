@@ -28,7 +28,7 @@ type referenceIteratorStream[T any] struct {
 	v  T
 }
 
-func (s *referenceIteratorStream[T]) read() *T {
+func (s *referenceIteratorStream[T]) Read() *T {
 	if s.it.Next() {
 		s.v = s.r.Value()
 		return &s.v
@@ -36,7 +36,7 @@ func (s *referenceIteratorStream[T]) read() *T {
 	return nil
 }
 
-func (s *valueIteratorStream[T]) read() *T {
+func (s *valueIteratorStream[T]) Read() *T {
 	if s.it.Next() {
 		return s.v
 	}
@@ -56,4 +56,15 @@ func FromInterfaceIterable[T any](it Iterable[*T]) Stream[T] {
 func FromReferenceIterable[T any](it Iterable[Reference[T]]) Stream[T] {
 	it2, v := it.Iterator()
 	return &referenceIteratorStream[T]{it: it2, r: v}
+}
+
+func Channel[T any](i Iterable[T]) <-chan T {
+	ch := make(chan T)
+	go func() {
+		for it, v := i.Iterator(); it.Next(); {
+			ch <- v
+		}
+		close(ch)
+	}()
+	return ch
 }

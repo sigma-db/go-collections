@@ -12,7 +12,7 @@ type cartesianProductStream[T, U any] struct {
 	v    Pair[T, U]
 }
 
-func (s *cartesianProductStream[T, U]) read() *Pair[T, U] {
+func (s *cartesianProductStream[T, U]) Read() *Pair[T, U] {
 	if s.i >= len(s.s) {
 		return nil
 	}

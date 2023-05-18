@@ -8,7 +8,7 @@ import (
 func TestStreamFromIterable(t *testing.T) {
 	s := FromValueIterable[int](Range(1, 10))
 	s = Transform(s, FilterStream(func(x *int) bool { return *x > 1 }))
-	result := Collect(s)
+	result := Collect(s, SliceCollector[int])
 
 	if len(result) != 8 {
 		t.Log(result)
@@ -24,7 +24,7 @@ func TestStreamFromIterable(t *testing.T) {
 func TestStreamFromStreamer(t *testing.T) {
 	s := asc(10).Stream()
 	s = Transform(s, FilterStream(func(x *int) bool { return *x > 1 }))
-	result := Collect(s)
+	result := Collect(s, SliceCollector[int])
 
 	if len(result) != 8 {
 		t.Log(result)
@@ -42,7 +42,7 @@ func TestStreamComposition(t *testing.T) {
 	s = Transform(s, FilterStream(func(x *float64) bool { _, f := math.Modf(*x); return f == 0.5 }))
 	s = Transform(s, MapStream(func(x *float64) float64 { return *x * 2 }))
 	s = Transform(s, ReduceStream(func(a float64, b *float64) float64 { return a + *b }))
-	q := Collect(s)
+	q := Collect(s, SliceCollector[float64])
 
 	if l := len(q); l != 1 {
 		t.Fatalf("Expected %d, got %d", 1, l)
